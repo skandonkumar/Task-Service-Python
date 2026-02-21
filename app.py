@@ -68,9 +68,24 @@ def get_task(task_id):
         return jsonify(task_dict)
         
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e)}), 
+        
+def init_db():
+    """Initialize database with retries"""
+    max_retries = 5
+    for i in range(max_retries):
+        try:
+            with app.app_context():
+                db.create_all()
+            print("Database initialized successfully")
+            return
+        except Exception as e:
+            print(f"Database init attempt {i + 1}/{max_retries} failed: {e}")
+            if i < max_retries - 1:
+                time.sleep(2)
+            else:
+                raise
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+    init_db()
     app.run(host='0.0.0.0', port=5000)

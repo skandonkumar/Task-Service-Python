@@ -12,7 +12,7 @@ PG_PASS = os.getenv('POSTGRES_PASSWORD', 'postgres')
 PG_HOST = os.getenv('POSTGRES_HOST', 'localhost')
 PG_PORT = os.getenv('POSTGRES_PORT', '5432')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/tasks_db"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/task_db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -69,23 +69,6 @@ def get_task(task_id):
         
     except Exception as e:
         return jsonify({"error": str(e)}), 
-        
-def init_db():
-    """Initialize database with retries"""
-    max_retries = 5
-    for i in range(max_retries):
-        try:
-            with app.app_context():
-                db.create_all()
-            print("Database initialized successfully")
-            return
-        except Exception as e:
-            print(f"Database init attempt {i + 1}/{max_retries} failed: {e}")
-            if i < max_retries - 1:
-                time.sleep(2)
-            else:
-                raise
 
 if __name__ == '__main__':
-    init_db()
     app.run(host='0.0.0.0', port=5000)
